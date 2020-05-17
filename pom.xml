@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.6.RELEASE</version>
+		<version>2.2.7.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cg.iter</groupId>
-	<artifactId>GreatOutDoors-AdminReportMS</artifactId>
+	<artifactId>GreatOutDoors-GoAdminReportMS</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>GreatOutDoors-AdminReportMS</name>
+	<name>GreatOutDoors-GoAdminReportMS</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -58,9 +58,15 @@
 		</dependency>
 		<dependency>
 			<groupId>com.oracle.ojdbc</groupId>
-			<artifactId>ojdbc6</artifactId>
+			<artifactId>ojdbc8</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		 <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>
+      <scope>runtime</scope>
+   </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

@@ -1,7 +1,13 @@
 package com.cg.iter.dto;
 
-public class ViewDetailedSalesReportByProductDTO {
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "View_SaleProductReport")
+public class ViewDetailedSalesReportByProductDTO {
+	@Id
 	private int period;
 	private Double revenue;
 	private Double amountChange;

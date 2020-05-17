@@ -10,12 +10,11 @@ import com.cg.iter.exception.GoAdminException;
 
 public interface GoAdminReportsService {
 
-		List<ViewSalesReportByUserDTO> viewSalesReportByUserAndCategory(Date entry, Date exit, String TargetuserId,
-				int category) throws GoAdminException,ConnectException;
+		List<ViewDetailedSalesReportByProductDTO> viewDetailedSalesReportByProduct(Date dentry, Date dexit,int cat,
+				int categoryType) throws GoAdminException, ConnectException;
 
-
-		List<ViewDetailedSalesReportByProductDTO> viewDetailedSalesReportByProduct(Date entry, Date exit, int cat,int category)
-				 throws GoAdminException,ConnectException;
+		List<ViewSalesReportByUserDTO> viewSalesReportByUserAndCategory(Date dentry, Date dexit, String userId,
+				int categoryType) throws GoAdminException, ConnectException;
 
 	
 	

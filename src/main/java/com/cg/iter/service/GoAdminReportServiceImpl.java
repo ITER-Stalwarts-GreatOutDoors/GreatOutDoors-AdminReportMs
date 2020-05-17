@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+//import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +17,18 @@ import com.cg.iter.dto.ViewSalesReportByUserDTO;
 
 import com.cg.iter.exception.ExceptionConstants;
 import com.cg.iter.exception.GoAdminException;
+import com.cg.iter.repository.SaleProductReportRepository;
+import com.cg.iter.repository.SaleReportRepository;
 
 @Service(value = "goAdminReportService")
 public class GoAdminReportServiceImpl implements GoAdminReportsService {
 
+	//private Logger logger = Logger.getRootLogger();
+	@Autowired
+	SaleReportRepository salereportrepository;
 	
+	@Autowired
+	SaleProductReportRepository saleproductreportrepository;
 
 	public List<ViewSalesReportByUserDTO> viewSalesReportByUserAndCategory(Date entry, Date exit, String TargetuserId,
 			int category) throws GoAdminException, ConnectException {
@@ -31,27 +39,28 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 		
 
 			if (entry == null || exit == null) {
-				
+				//logger.error(ExceptionConstants.INVALID_DATE);
 				throw new GoAdminException(ExceptionConstants.INVALID_DATE);
 			}
 
-			
-			List<Object[]> results = session.createQuery(HQLQuerryMapper.SELECT_DATA_FROM_DATABASE).getResultList();
+			//results object array
+			Iterable<ViewSalesReportByUserDTO> results = salereportrepository.findAll();
+					//session.createQuery(HQLQuerryMapper.SELECT_DATA_FROM_DATABASE).getResultList();
 			String userId, date, orderId, productId;
 			int productCategory;
 			Double productPrice;
 
-			for (Object[] data : results) {
+			for (ViewSalesReportByUserDTO data : results) {
 				
+				//storing the data from database to a temporary variable
+				userId = data.getUserId();
+				date = data.getDate();
+				orderId = data.getOrderId();
+				productId = data.getProductId();
+				productCategory = data.getProductCategory();
+				productPrice = data.getProductPrice();
 				
-				userId = data[0].toString();
-				date = data[1].toString();
-				orderId = data[2].toString();
-				productId = data[3].toString();
-				productCategory = Integer.parseInt(data[4].toString());
-				productPrice = Double.parseDouble(data[5].toString());
-				
-				
+				//First condition i.e a particular UserId and Product category
 				if (TargetuserId.equalsIgnoreCase(userId) && category == productCategory) {
 
 					temp = new ViewSalesReportByUserDTO();
@@ -63,7 +72,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 					temp.setProductCategory(productCategory);
 					viewSales.add(temp);
 				} 
-				
+				//Second condition i.e a All UserId and Product category
 				else if (TargetuserId.equalsIgnoreCase("ALL") && category == productCategory) {
 					temp = new ViewSalesReportByUserDTO();
 					temp.setUserId(userId);
@@ -74,7 +83,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 					temp.setProductCategory(productCategory);
 					viewSales.add(temp);
 				} 
-				
+				//Third condition i.e All UserId and All Product category
 				else if (TargetuserId.equalsIgnoreCase("ALL") && category == 6) {
 					temp = new ViewSalesReportByUserDTO();
 					temp.setUserId(userId);
@@ -94,7 +103,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 			System.out.println(e.getMessage());
 
 		} catch (Exception exp) {
-			
+			//logger.error(exp.getMessage());
 			throw new GoAdminException(ExceptionConstants.ERROR_IN_VIEWING + exp.getMessage()); 
 			
 
@@ -135,7 +144,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 		try {
 			
 			if (entry == null || exit == null) {
-				
+				//logger.error(ExceptionConstants.INVALID_DATE);
 				throw new GoAdminException(ExceptionConstants.INVALID_DATE);
 
 			}
@@ -143,27 +152,30 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 			int endYear = exit.getYear();
 
 
-			List<Object[]> results = session.createQuery(HQLQuerryMapper.SELECT_REVENUE_DATA).getResultList();
+			List<ViewDetailedSalesReportByProductDTO> results = (List<ViewDetailedSalesReportByProductDTO>) saleproductreportrepository.findAll();
+					//session.createQuery(HQLQuerryMapper.SELECT_REVENUE_DATA).getResultList();
 
 			Double price;
 
-			if (results.size() == 0) {
-			
+			if (results.size()== 0) {
+				//logger.error(ExceptionConstants.EMPTY_DATABASE);
 				throw new GoAdminException(ExceptionConstants.EMPTY_DATABASE);
 
 			}
 
+			// loop from start year to end year
 			for (int index = startYear; index <= endYear; index++) {
-				for (Object[] rs : results) {
+				// loop for going through order list
+				for (ViewDetailedSalesReportByProductDTO rs : results) {
 
-					int month = Integer.parseInt((rs[0].toString().substring(5, 7)));
-					int year = Integer.parseInt((rs[0].toString().substring(0, 4))) - 1900;
+					int month = Integer.parseInt((rs.toString().substring(5, 7)));
+					int year = Integer.parseInt((rs.toString().substring(0, 4))) - 1900;
 
 					for (j = 0; j <= 11; j++) {
 
 						if (month == j && year == index) {
 
-							price = Double.parseDouble(rs[1].toString());
+							price = rs.getRevenue();
 							arrRevM[j] += price;
 
 						}
@@ -172,9 +184,11 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 					
 				}
 				
+				// loop for going from January to December
 				for (j = 0; j <= 11; j++) {
 
 					temp = new ViewDetailedSalesReportByProductDTO();
+					// Initializing the amount change of current month and previous month
 
 					if (j == 0) {
 
@@ -187,6 +201,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 
 					}
 
+					// checking the necessary condition for color code
 					if (perChngM[j] >= 10.0)
 						codeM[j] = "GREEN";
 					else if (perChngM[j] >= 2.0 && perChngM[j] <= 10)
@@ -205,6 +220,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 
 				}
 
+				// Initializing previous month as last month of current year
 				prevM = arrRevM[11];
 
 				int k = 0;
@@ -217,6 +233,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 				for (j = 0; j <= 3; j++) {
 
 					temp = new ViewDetailedSalesReportByProductDTO();
+					// Initializing the amount change of current month and previous month
 
 					if (j == 0) {
 
@@ -230,6 +247,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 
 					}
 
+					// checking the necessary condition for color code
 					if (perChngQ[j] >= 10.0)
 						codeQ[j] = "GREEN";
 					else if (perChngQ[j] >= 2.0 && perChngQ[j] <= 10)
@@ -247,9 +265,10 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 					viewDetailedSalesReportByProduct.add(temp);
 
 				}
+				// Initializing the amount change of previous quarter as last quarter
 				prevQ = arrRevQ[3];
 
-				
+				// year to year
 				arrRevY = arrRevQ[0] + arrRevQ[1] + arrRevQ[2] + arrRevQ[3];
 				amtY = arrRevY - prevY;
 				perChngY = Math.round((100 * (amtY / prevY)));
@@ -290,8 +309,10 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 				arrRevY = 0.0;
 
 			}
+			// end of index year
 
 			int n = viewDetailedSalesReportByProduct.size(), index;
+			//Month to month
 			if (category == 1) {
 				for (index = 0; index < n; index++) {
 
@@ -300,6 +321,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 				}
 
 			} 
+			//Quarter to Quarter
 			else if (category == 2) {
 				for (index = 0; index < n; index++) {
 					if (viewDetailedSalesReportByProduct.get(index).getType().equalsIgnoreCase("QUARTER"))
@@ -307,6 +329,7 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 				}
 
 			}
+			//Year to Year
 			else if (category == 3) {
 				for (index = 0; index < n; index++) {
 					if (viewDetailedSalesReportByProduct.get(index).getType().equalsIgnoreCase("YEAR"))
@@ -314,10 +337,12 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 				}
 			}
 		} catch (HibernateException e) {
+			//logger.error(e.getMessage());
 
 			session.getTransaction().rollback();
 
 		} catch (Exception exp) {
+			//logger.error(exp.getMessage());
 			throw new GoAdminException(ExceptionConstants.ERROR_IN_VIEWING + exp.getMessage()); 
 			
 
@@ -327,6 +352,8 @@ public class GoAdminReportServiceImpl implements GoAdminReportsService {
 
 
 	}
+
+	
 
 
 }

@@ -50,17 +50,7 @@ public class GoAdminReportsController {
 
 			list = goAdminReportsService.viewSalesReportByUserAndCategory(dentry, dexit,
 					userId, categoryType);
-			/*
-			 * for (ViewSalesReportByUserDTO bean : list) { List<ViewSalesReportByUserDTO>
-			 * dataObj = new ArrayList<ViewSalesReportByUserDTO>();
-			 * dataObj.add(bean.getUserId()); dataObj.add("date",
-			 * bean.getDate().toString()); dataObj.addProperty("orderId",
-			 * bean.getOrderId()); dataObj.addProperty("productId", bean.getProductId());
-			 * dataObj.addProperty("productCategory",
-			 * Integer.toString(bean.getProductCategory()));
-			 * dataObj.addProperty("productPrice", Double.toString(bean.getProductPrice()));
-			 * dataList.add(dataObj); }
-			 */
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -72,39 +62,37 @@ public class GoAdminReportsController {
 
 	@RequestMapping(value = "/GrowthReports", method = RequestMethod.POST)
 
-	public String getGrowthReports(@RequestBody Map<String, Object> requestData) throws GoAdminException {
-
-		int categoryType = Integer.parseInt(requestData.get("reportType").toString());
-		String date1 = requestData.get("startDate").toString();
-		String date2 = requestData.get("endDate").toString();
+	public List<ViewDetailedSalesReportByProductDTO> getGrowthReports(@RequestParam int categoryType, @RequestParam String date1, @RequestParam String date2) throws GoAdminException {
 
 		
+
+		
+		List<ViewDetailedSalesReportByProductDTO> list = null;
 		try {
 
 			Date dentry = new SimpleDateFormat("yyyy-MM-dd").parse(date1);
 			Date dexit = new SimpleDateFormat("yyyy-MM-dd").parse(date2);
 
-			List<ViewDetailedSalesReportByProductDTO> list = goAdminReportsService
-					.viewDetailedSalesReportByProduct(dentry, dexit, categoryType);
+			//list = goAdminReportsService.viewDetailedSalesReportByProduct(dentry, dexit, categoryType);
 			for (ViewDetailedSalesReportByProductDTO bean : list) {
 				if (categoryType == 1) {
-					dataObj.addProperty("period", Month.of(bean.getPeriod() + 1).name());
+					//dataObj.addProperty("period", Month.of(bean.getPeriod() + 1).name());
 				} else if (categoryType == 2) {
-					dataObj.addProperty("period", "Q" + Integer.toString((bean.getPeriod()) + 1));
+					//dataObj.addProperty("period", "Q" + Integer.toString((bean.getPeriod()) + 1));
 				} else {
-					dataObj.addProperty("period", "YEAR:" + Integer.toString(bean.getPeriod()));
+					//dataObj.addProperty("period", "YEAR:" + Integer.toString(bean.getPeriod()));
 				}
-				dataObj.addProperty("revenue", Double.toString(bean.getRevenue()));
-				dataObj.addProperty("amountChange", Double.toString(bean.getAmountChange()));
-				dataObj.addProperty("percentageGrowth", Double.toString(bean.getPercentageGrowth()));
-				dataObj.addProperty("colorCode", bean.getCode());
-				dataList.add(dataObj);
+//				dataObj.addProperty("revenue", Double.toString(bean.getRevenue()));
+//				dataObj.addProperty("amountChange", Double.toString(bean.getAmountChange()));
+//				dataObj.addProperty("percentageGrowth", Double.toString(bean.getPercentageGrowth()));
+//				dataObj.addProperty("colorCode", bean.getCode());
+//				dataList.add(dataObj);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return dataList.toString();
+		return list;
 	}
 
 }

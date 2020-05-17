@@ -1,6 +1,13 @@
 package com.cg.iter.dto;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "View_SaleReport")
 public class ViewSalesReportByUserDTO {
+	@Id
 	private String userId;
 	private String date;
 	private String orderId;
