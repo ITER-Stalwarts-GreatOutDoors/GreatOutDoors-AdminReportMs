@@ -3,6 +3,7 @@ package com.cg.iter.controller;
 import java.text.SimpleDateFormat;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,62 +38,78 @@ public class GoAdminReportsController {
 		this.goAdminReportsService = goAdminReportsService;
 	}
 
+	
+
+	@SuppressWarnings("null")
 	@ResponseBody
 	@RequestMapping(value = "/RevenueReports", method = RequestMethod.POST)
 	public List<ViewSalesReportByUserDTO> getRevenueReports(@RequestParam String userId,@RequestParam int categoryType,
 			@RequestParam String date1,@RequestParam String date2) {
-		List<ViewSalesReportByUserDTO> list = null;
+		List<ViewSalesReportByUserDTO> list = new ArrayList<ViewSalesReportByUserDTO>();
 		
 		try {
 			
 			Date dentry = new SimpleDateFormat("yyyy-MM-dd").parse(date1);
 			Date dexit = new SimpleDateFormat("yyyy-MM-dd").parse(date2);
 
-			list = goAdminReportsService.viewSalesReportByUserAndCategory(dentry, dexit,
-					userId, categoryType);
+			goAdminReportsService.viewSalesReportByUserAndCategory(dentry, dexit,
+				userId, categoryType);
+//			list = new ArrayList<ViewSalesReportByUserDTO>();
 			
+			  for (ViewSalesReportByUserDTO bean : list) { 
+//				  list = new ArrayList<ViewSalesReportByUserDTO>();
+			
+			   bean.getUserId(); 
+			   bean.getDate().toString(); 
+			   bean.getOrderId(); 
+			   bean.getProductId();
+			   Integer.toString(bean.getProductCategory());
+			   Double.toString(bean.getProductPrice());
+			   list.add(bean);
+			   } 
+			 
 		} catch (Exception e) {
-			e.printStackTrace();
+		
 		}
 
 		return list;
 	}
-
 	@ResponseBody
 
 	@RequestMapping(value = "/GrowthReports", method = RequestMethod.POST)
 
 	public List<ViewDetailedSalesReportByProductDTO> getGrowthReports(@RequestParam int categoryType, @RequestParam String date1, @RequestParam String date2) throws GoAdminException {
 
-		
-
-		
-		List<ViewDetailedSalesReportByProductDTO> list = null;
+	
+		List<ViewDetailedSalesReportByProductDTO> list =  new ArrayList<ViewDetailedSalesReportByProductDTO>();
 		try {
 
 			Date dentry = new SimpleDateFormat("yyyy-MM-dd").parse(date1);
 			Date dexit = new SimpleDateFormat("yyyy-MM-dd").parse(date2);
-
-			//list = goAdminReportsService.viewDetailedSalesReportByProduct(dentry, dexit, categoryType);
+           
+//			list = new ArrayList<ViewDetailedSalesReportByProductDTO>();
+			goAdminReportsService.viewDetailedSalesReportByProduct(dentry, dexit, categoryType, categoryType);
 			for (ViewDetailedSalesReportByProductDTO bean : list) {
+//        		list = new ArrayList<ViewDetailedSalesReportByProductDTO>();
 				if (categoryType == 1) {
-					//dataObj.addProperty("period", Month.of(bean.getPeriod() + 1).name());
+					 Month.of(bean.getPeriod() + 1).name();
 				} else if (categoryType == 2) {
-					//dataObj.addProperty("period", "Q" + Integer.toString((bean.getPeriod()) + 1));
+					 Integer.toString((bean.getPeriod()) + 1);
 				} else {
-					//dataObj.addProperty("period", "YEAR:" + Integer.toString(bean.getPeriod()));
+					 Integer.toString(bean.getPeriod());
 				}
-//				dataObj.addProperty("revenue", Double.toString(bean.getRevenue()));
-//				dataObj.addProperty("amountChange", Double.toString(bean.getAmountChange()));
-//				dataObj.addProperty("percentageGrowth", Double.toString(bean.getPercentageGrowth()));
-//				dataObj.addProperty("colorCode", bean.getCode());
-//				dataList.add(dataObj);
+				 Double.toString(bean.getRevenue());
+				 Double.toString(bean.getAmountChange());
+				 Double.toString(bean.getPercentageGrowth());
+				 bean.getCode();
+				list.add(bean);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 		}
 
 		return list;
 	}
-
 }
+
+
